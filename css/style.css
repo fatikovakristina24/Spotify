@@ -597,6 +597,9 @@ img.share__checker { height: calc(857 * var(--u)); object-fit: cover; }
   .box__text { width: auto; }
   .box__text.fs { --fs: 32 !important; line-height: 1.4; }
 
+  /* на телефоне декор не ездит при прокрутке — всё стоит ровно относительно текста */
+  [data-parallax] { translate: none !important; }
+
   /* на маленьком экране плотный трекинг макета склеивает буквы — ослабляем его */
   :where(.sec:not(.sec--hero)) .fs { letter-spacing: 0; }
   .design__list li { letter-spacing: 0; }
@@ -620,9 +623,9 @@ img.share__checker { height: calc(857 * var(--u)); object-fit: cover; }
   .days__dots img { left: calc((var(--x) - 16) * var(--u)); top: calc((var(--y) - 1024) * var(--u)); }
 
   /* ---- 3. история ---- */
-  .sec--history .canvas { padding-top: calc(400 * var(--u)); }
-  /* линия-каракуль только в верхней декоративной зоне, не поверх текста */
-  .history__line { width: calc(760 * var(--u)); left: 0; top: calc(-40 * var(--u)); }
+  .sec--history .canvas { padding-top: calc(300 * var(--u)); }
+  /* на телефоне линии-каракули поверх текста мешают читать — скрываем */
+  .history__line { display: none; }
   .sec--history .history__title-bg { padding: calc(26 * var(--u)) calc(36 * var(--u)); }
   .history__title { --fs: 44 !important; padding-top: 0; }
   .history__timeline { display: flex; flex-direction: column; align-items: center; gap: calc(26 * var(--u)); }
@@ -635,15 +638,16 @@ img.share__checker { height: calc(857 * var(--u)); object-fit: cover; }
   .build__row { display: flex; align-items: center; justify-content: center; gap: calc(40 * var(--u)); margin-bottom: calc(40 * var(--u)); }
   .build__num { --fs: 220 !important; }
   .sec--build .build__list { --fs: 40 !important; }
-  .build__line { top: auto; bottom: 0; }
+  .build__line { display: none; }
 
   /* ---- 5. обложки и основа дизайна ---- */
   .sec--design .canvas { padding-top: calc(60 * var(--u)); }
-  .sec--design .covers { order: -1; z-index: 1; align-self: flex-end; width: calc(500 * var(--u)); margin-bottom: calc(150 * var(--u)); }
-  .design__year { width: calc(250 * var(--u)); left: calc(8 * var(--u)); top: calc(40 * var(--u)); }
+  .sec--design .covers { order: -1; z-index: 1; align-self: flex-end; width: calc(500 * var(--u)); margin-bottom: calc(80 * var(--u)); }
+  /* «2026» ровно по высоте коллажа обложек (500u) и целиком в экране */
+  .design__year { width: calc(206 * var(--u)); left: calc(16 * var(--u)); top: calc(60 * var(--u)); }
   /* левый обрезанный край кругов прячется под коллажем, снизу круги срезаны по линии коллажа */
   img.design__rings { width: calc(600 * var(--u)); height: calc(563 * var(--u)); left: calc(236 * var(--u)); top: 0; object-fit: cover; object-position: top left; }
-  .design__lines { width: calc(640 * var(--u)); top: calc(90 * var(--u)); }
+  .design__lines { display: none; }
   .design__cols { display: flex; flex-direction: column; gap: calc(48 * var(--u)); align-self: stretch; margin-bottom: calc(40 * var(--u)); }
   .design__col-title.fs { --fs: 56 !important; width: auto; }
   .design__list.fs { --fs: 40 !important; }
@@ -742,7 +746,8 @@ img.share__checker { height: calc(857 * var(--u)); object-fit: cover; }
   .final__title { --fs: 50 !important; }
   .final__months { --fs: 100 !important; }
   .sec--final .box.final__box { order: 3; }
-  .divider--abs { position: relative; order: 4; top: auto; left: auto; right: auto; align-self: stretch; margin-inline: calc(-1 * var(--g)); }
+  /* полоса примыкает к салатовой плашке вплотную, как остальные разделители */
+  .divider--abs { position: relative; order: 4; top: auto; left: auto; right: auto; align-self: stretch; margin: calc(-44 * var(--u)) calc(-1 * var(--g)) 0; }
   .sec--final .final__sign { order: 5; align-self: stretch; margin-top: calc(56 * var(--u)); gap: calc(14 * var(--u)); }
   .final__spotify { --fs: 72 !important; }
   .final__wrapped { width: 100%; max-width: calc(893.514 * var(--u)); }
