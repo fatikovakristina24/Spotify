@@ -595,7 +595,13 @@ img.share__checker { height: calc(857 * var(--u)); object-fit: cover; }
     padding: calc(40 * var(--u)) var(--g) calc(44 * var(--u));
   }
   .box__text { width: auto; }
-  .box__text.fs { --fs: 30 !important; line-height: 1.3; }
+  .box__text.fs { --fs: 32 !important; line-height: 1.4; }
+
+  /* на маленьком экране плотный трекинг макета склеивает буквы — ослабляем его */
+  :where(.sec:not(.sec--hero)) .fs { letter-spacing: 0; }
+  .design__list li { letter-spacing: 0; }
+  /* заголовки переносятся ровными строками, без одиноких слов */
+  :where(.sec:not(.sec--hero)) .ru { text-wrap: balance; }
 
   /* ---- 2. 365 дней ---- */
   .sec--days .canvas { padding-top: calc(390 * var(--u)); }
@@ -614,7 +620,9 @@ img.share__checker { height: calc(857 * var(--u)); object-fit: cover; }
   .days__dots img { left: calc((var(--x) - 16) * var(--u)); top: calc((var(--y) - 1024) * var(--u)); }
 
   /* ---- 3. история ---- */
-  .sec--history .canvas { padding-top: calc(300 * var(--u)); }
+  .sec--history .canvas { padding-top: calc(400 * var(--u)); }
+  /* линия-каракуль только в верхней декоративной зоне, не поверх текста */
+  .history__line { width: calc(760 * var(--u)); left: 0; top: calc(-40 * var(--u)); }
   .sec--history .history__title-bg { padding: calc(26 * var(--u)) calc(36 * var(--u)); }
   .history__title { --fs: 44 !important; padding-top: 0; }
   .history__timeline { display: flex; flex-direction: column; align-items: center; gap: calc(26 * var(--u)); }
@@ -633,7 +641,8 @@ img.share__checker { height: calc(857 * var(--u)); object-fit: cover; }
   .sec--design .canvas { padding-top: calc(60 * var(--u)); }
   .sec--design .covers { order: -1; z-index: 1; align-self: flex-end; width: calc(500 * var(--u)); margin-bottom: calc(150 * var(--u)); }
   .design__year { width: calc(250 * var(--u)); left: calc(8 * var(--u)); top: calc(40 * var(--u)); }
-  .design__rings { width: calc(600 * var(--u)); left: calc(200 * var(--u)); top: 0; }
+  /* левый обрезанный край кругов прячется под коллажем, снизу круги срезаны по линии коллажа */
+  img.design__rings { width: calc(600 * var(--u)); height: calc(563 * var(--u)); left: calc(236 * var(--u)); top: 0; object-fit: cover; object-position: top left; }
   .design__lines { width: calc(640 * var(--u)); top: calc(90 * var(--u)); }
   .design__cols { display: flex; flex-direction: column; gap: calc(48 * var(--u)); align-self: stretch; margin-bottom: calc(40 * var(--u)); }
   .design__col-title.fs { --fs: 56 !important; width: auto; }
@@ -688,7 +697,7 @@ img.share__checker { height: calc(857 * var(--u)); object-fit: cover; }
   /* ---- 8. алгоритм ---- */
   .sec--algo .canvas { padding-top: calc(60 * var(--u)); gap: calc(36 * var(--u)); }
   .algo__hex { width: calc(1000 * var(--u)); left: calc(-120 * var(--u)); top: calc(20 * var(--u)); }
-  .sec--algo .algo__badge { order: -1; width: calc(480 * var(--u)); }
+  .sec--algo .algo__badge { order: -1; z-index: 1; width: calc(480 * var(--u)); }
   .sec--algo .algo__card {
     align-self: stretch;
     gap: calc(44 * var(--u));
@@ -719,7 +728,7 @@ img.share__checker { height: calc(857 * var(--u)); object-fit: cover; }
     height: calc(560 * var(--u));
   }
   .final__line--b { top: calc(40 * var(--u)); }
-  .final__line--a { top: calc(560 * var(--u)); }
+  .final__line--a { top: calc(300 * var(--u)); }
   .sec--final .final__result {
     order: 1;
     align-self: stretch;
@@ -738,6 +747,6 @@ img.share__checker { height: calc(857 * var(--u)); object-fit: cover; }
   .final__spotify { --fs: 72 !important; }
   .final__wrapped { width: 100%; max-width: calc(893.514 * var(--u)); }
   .final__name { --fs: 46 !important; width: auto; height: auto; }
-  .final__scribble--a { top: auto; bottom: calc(-260 * var(--u)); left: calc(40 * var(--u)); }
-  .final__scribble--b { top: auto; bottom: calc(-200 * var(--u)); left: calc(-160 * var(--u)); }
+  .final__scribble--a { top: auto; bottom: calc(-330 * var(--u)); left: calc(40 * var(--u)); }
+  .final__scribble--b { top: auto; bottom: calc(-270 * var(--u)); left: calc(-160 * var(--u)); }
 }
