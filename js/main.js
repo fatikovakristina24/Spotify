@@ -102,9 +102,14 @@
     }, last + REVEAL_TIME);
   };
 
+  // следующая секция открывается, только когда предыдущая пролистана:
+  // её низ поднялся выше этой доли экрана (или страница докручена до конца)
+  const PREV_SCROLLED = 0.4;
+
   const checkReveal = () => {
     revealQueued = false;
     const vh = window.innerHeight;
+    const atPageEnd = window.scrollY + vh >= document.documentElement.scrollHeight - 2;
     for (let i = 0; i < sections.length; i += 1) {
       const s = sections[i];
       if (s.state === 'open') continue;
@@ -114,7 +119,9 @@
         openSection(s, true); // секция уже выше экрана
         continue;
       }
-      if (r.top < vh * 0.85) openSection(s, false);
+      const prev = sections[i - 1];
+      const prevScrolled = !prev || atPageEnd || prev.sec.getBoundingClientRect().bottom <= vh * PREV_SCROLLED;
+      if (prevScrolled && r.top < vh) openSection(s, false);
       break; // следующая секция ждёт своей очереди
     }
     if (sections.every((s) => s.state === 'open')) stopReveal();
@@ -140,6 +147,82 @@
     window.addEventListener('scroll', queueReveal, { passive: true });
     window.addEventListener('resize', queueReveal);
     queueReveal();
+  };
+
+  /* ---------- текст проявляется словами по мере прокрутки ---------- */
+  // Абзац разбивается на слова. Чем дальше прокручен абзац, тем больше слов видно;
+  // при прокрутке назад слова снова гаснут.
+  const SCROLL_TEXT = '.box__text, .days__text, .algo__lead, .algo__row';
+  let scrollTexts = [];
+  let textQueued = false;
+
+  const splitWords = (root) => {
+    const words = [];
+    const walk = (node) => {
+      Array.from(node.childNodes).forEach((child) => {
+        if (child.nodeType === Node.TEXT_NODE) {
+          const parts = child.textContent.split(/(\s+)/);
+          const frag = document.createDocumentFragment();
+          parts.forEach((part) => {
+            if (!part) return;
+            if (/^\s+$/.test(part)) {
+              frag.appendChild(document.createTextNode(part));
+            } else {
+              const span = document.createElement('span');
+              span.className = 'w';
+              span.textContent = part;
+              frag.appendChild(span);
+              words.push(span);
+            }
+          });
+          child.replaceWith(frag);
+        } else if (child.nodeType === Node.ELEMENT_NODE) {
+          walk(child);
+        }
+      });
+    };
+    walk(root);
+    return words;
+  };
+
+  const updateScrollText = () => {
+    textQueued = false;
+    const vh = window.innerHeight;
+    const atPageEnd = window.scrollY + vh >= document.documentElement.scrollHeight - 2;
+    scrollTexts.forEach((t) => {
+      const r = t.el.getBoundingClientRect();
+      // 0 — верх абзаца у нижнего края экрана, 1 — низ абзаца поднялся до середины экрана
+      let p = (vh * 0.95 - r.top) / (r.height + vh * 0.45);
+      if (atPageEnd) p = 1;
+      const count = Math.round(Math.max(0, Math.min(1, p)) * t.words.length);
+      if (count === t.shown) return;
+      t.words.forEach((w, i) => w.classList.toggle('on', i < count));
+      t.shown = count;
+    });
+  };
+
+  const queueScrollText = () => {
+    if (!textQueued) {
+      textQueued = true;
+      requestAnimationFrame(updateScrollText);
+    }
+  };
+
+  const initScrollText = () => {
+    if (motion.matches) return;
+    scrollTexts = Array.from(document.querySelectorAll(SCROLL_TEXT)).map((el) => {
+      el.classList.add('scroll-text');
+      return { el, words: splitWords(el), shown: -1 };
+    });
+    window.addEventListener('scroll', queueScrollText, { passive: true });
+    window.addEventListener('resize', queueScrollText);
+    updateScrollText();
+  };
+
+  const disableScrollText = () => {
+    window.removeEventListener('scroll', queueScrollText);
+    window.removeEventListener('resize', queueScrollText);
+    scrollTexts.forEach((t) => t.el.classList.remove('scroll-text'));
   };
 
   /* ---------- параллакс декоративных элементов ---------- */
@@ -384,6 +467,7 @@
     initDrag();
     initTaps();
     initPointerFollow();
+    initScrollText();
     initReveal();
     if (!motion.matches) enableParallax();
   };
@@ -393,6 +477,7 @@
       sections.forEach((sec) => { sec.state = 'open'; });
       stopReveal();
       showAll();
+      disableScrollText();
       disableParallax();
     } else {
       enableParallax();

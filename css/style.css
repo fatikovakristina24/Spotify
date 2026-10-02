@@ -318,6 +318,9 @@ img.share__checker { height: calc(857 * var(--u)); object-fit: cover; }
   outline: calc(.949 * var(--u)) solid var(--frame);
   outline-offset: calc(-.949 * var(--u));
 }
+/* рамка стопки не выдаёт секцию раньше времени: появляется вместе с пластинками */
+.final__stack { transition: outline-color .6s var(--ease); }
+.js .final__stack:not(:has(.is-in)) { outline-color: transparent; }
 .final__disc {
   display: block;
   height: calc(713 * var(--u));
@@ -403,6 +406,10 @@ img.share__checker { height: calc(857 * var(--u)); object-fit: cover; }
   transition-delay: var(--d, 0ms), var(--d, 0ms), 0s, 0s;
   transition-timing-function: var(--ease);
 }
+
+/* текст проявляется словами по мере прокрутки (слова размечает JS) */
+.scroll-text .w { opacity: 0; transition: opacity .35s ease-out; }
+.scroll-text .w.on { opacity: 1; }
 
 /* счётчики: ширина фиксируется на время отсчёта, чтобы строка не прыгала */
 .is-counting { display: inline-block; text-align: right; }
