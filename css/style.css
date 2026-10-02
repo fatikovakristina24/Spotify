@@ -153,6 +153,8 @@ img.w.h { height: calc(var(--h) * var(--u)); }
 .box--bleed-l::before { right: calc(100% - 1px); }
 .box--bleed-r::after  { left: calc(100% - 1px); }
 .box__text { width: calc(var(--tw) * var(--u)); }
+/* текст во всех салатовых плашках стоит по центру */
+.box { display: flex; align-items: center; justify-content: center; padding: 0; }
 
 /* элементы, прижатые в макете к краю страницы, на экранах шире 1152px остаются у края экрана */
 .days__circles { left: var(--bleed); right: calc(-1 * var(--bleed)); }
@@ -592,7 +594,7 @@ img.share__checker { height: calc(857 * var(--u)); object-fit: cover; }
     order: 10;
     align-self: stretch;
     margin-inline: calc(-1 * var(--g));
-    padding: calc(40 * var(--u)) var(--g) calc(44 * var(--u));
+    padding: calc(42 * var(--u)) var(--g);
   }
   .box__text { width: auto; }
   .box__text.fs { --fs: 32 !important; line-height: 1.4; }
