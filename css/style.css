@@ -155,6 +155,10 @@ img.w.h { height: calc(var(--h) * var(--u)); }
 .box__text { width: calc(var(--tw) * var(--u)); }
 /* текст во всех салатовых плашках стоит по центру */
 .box { display: flex; align-items: center; justify-content: center; padding: 0; }
+/* у плашек, продолжающихся до края экрана с одной стороны, текст центрируется
+   по всему видимому зелёному прямоугольнику, а не только по самой плашке */
+.box--bleed-r:not(.box--bleed-l) .box__text { translate: calc(var(--bleed) / 2) 0; }
+.box--bleed-l:not(.box--bleed-r) .box__text { translate: calc(var(--bleed) / -2) 0; }
 
 /* элементы, прижатые в макете к краю страницы, на экранах шире 1152px остаются у края экрана */
 .days__circles { left: var(--bleed); right: calc(-1 * var(--bleed)); }
