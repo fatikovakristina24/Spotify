@@ -46,30 +46,78 @@
   /* ---------- появление при прокрутке ---------- */
   const showAll = () => animated.forEach((el) => el.classList.add('is-in'));
 
+  // Секции открываются строго по очереди: следующая начинает появляться только
+  // после того, как предыдущая открылась полностью. Внутри секции элементы идут
+  // каскадом сверху вниз, текст в салатовой плашке — после самой плашки.
   // Видимость проверяется по getBoundingClientRect: он не учитывает clip-path,
-  // поэтому элементы с анимацией «прорисовки» (clip-path: inset(0 100% 0 0))
-  // тоже корректно появляются. IntersectionObserver такие элементы не видит.
-  const pending = new Set();
+  // поэтому элементы с анимацией «прорисовки» тоже корректно появляются.
+  const REVEAL_TIME = 900;   // длительность появления одного элемента, мс
+  const CASCADE_MAX = 1200;  // весь каскад внутри секции укладывается в это время
+  const TEXT_AFTER_BOX = 650; // текст в плашке стартует, когда плашка почти выехала
+
+  const sections = Array.from(document.querySelectorAll('.sec')).map((sec) => ({
+    sec,
+    items: animated.filter((el) => el.closest('.sec') === sec),
+    state: 'closed', // closed → opening → open
+  }));
   let revealQueued = false;
+
+  const openSection = (s, instant) => {
+    s.state = 'opening';
+    const items = s.items
+      .map((el) => ({ el, r: el.getBoundingClientRect() }))
+      .sort((a, b) => a.r.top - b.r.top || a.r.left - b.r.left)
+      .map(({ el }) => el);
+
+    // секция, которую пролистали не глядя, открывается сразу, без анимации
+    if (instant) {
+      items.forEach((el) => {
+        el.style.transitionDuration = '0s';
+        el.style.setProperty('--d', '0ms');
+        el.classList.add('is-in');
+      });
+      requestAnimationFrame(() => items.forEach((el) => { el.style.transitionDuration = ''; }));
+      s.state = 'open';
+      return;
+    }
+
+    const step = Math.min(90, CASCADE_MAX / Math.max(items.length, 1));
+    let last = 0;
+    items.forEach((el, i) => {
+      let delay = Math.round(i * step);
+      if (el.classList.contains('box__text')) {
+        const box = el.closest('.box');
+        delay = Math.max(delay, (box ? Number(box.dataset.delay || 0) : 0) + TEXT_AFTER_BOX);
+      }
+      el.dataset.delay = String(delay);
+      el.style.setProperty('--d', `${delay}ms`);
+      el.classList.add('is-in');
+      startCounters(el, delay);
+      last = Math.max(last, delay);
+    });
+
+    setTimeout(() => {
+      s.state = 'open';
+      queueReveal();
+    }, last + REVEAL_TIME);
+  };
 
   const checkReveal = () => {
     revealQueued = false;
     const vh = window.innerHeight;
-    const visible = [];
-    pending.forEach((el) => {
-      const r = el.getBoundingClientRect();
-      if (r.top < vh * 0.94 && r.bottom > vh * 0.06) visible.push({ el, r });
-    });
-    // элементы, появившиеся одновременно, получают каскадную задержку
-    visible.sort((a, b) => a.r.top - b.r.top || a.r.left - b.r.left);
-    visible.forEach(({ el }, i) => {
-      const delay = Math.min(i * 90, 630);
-      el.style.setProperty('--d', `${delay}ms`);
-      el.classList.add('is-in');
-      startCounters(el, delay);
-      pending.delete(el);
-    });
-    if (!pending.size) stopReveal();
+    for (let i = 0; i < sections.length; i += 1) {
+      const s = sections[i];
+      if (s.state === 'open') continue;
+      if (s.state === 'opening') break; // ждём, пока откроется текущая
+      const r = s.sec.getBoundingClientRect();
+      if (r.bottom <= 0) {
+        openSection(s, true); // секция уже выше экрана
+        continue;
+      }
+      if (r.top < vh * 0.85) openSection(s, false);
+      break; // следующая секция ждёт своей очереди
+    }
+    if (sections.every((s) => s.state === 'open')) stopReveal();
   };
 
   const queueReveal = () => {
@@ -89,7 +137,6 @@
       showAll();
       return;
     }
-    animated.forEach((el) => pending.add(el));
     window.addEventListener('scroll', queueReveal, { passive: true });
     window.addEventListener('resize', queueReveal);
     queueReveal();
@@ -343,7 +390,7 @@
 
   motion.addEventListener('change', () => {
     if (motion.matches) {
-      pending.clear();
+      sections.forEach((sec) => { sec.state = 'open'; });
       stopReveal();
       showAll();
       disableParallax();

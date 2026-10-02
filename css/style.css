@@ -404,12 +404,6 @@ img.share__checker { height: calc(857 * var(--u)); object-fit: cover; }
   transition-timing-function: var(--ease);
 }
 
-/* текст в салатовых плашках проявляется после самой плашки */
-.js .box[data-anim] .box__text {
-  transition: opacity .8s var(--ease) calc(var(--d, 0ms) + 350ms), transform .8s var(--ease) calc(var(--d, 0ms) + 350ms);
-}
-.js .box[data-anim]:not(.is-in) .box__text { opacity: 0; transform: translateY(24px); }
-
 /* счётчики: ширина фиксируется на время отсчёта, чтобы строка не прыгала */
 .is-counting { display: inline-block; text-align: right; }
 
@@ -537,7 +531,6 @@ img.share__checker { height: calc(857 * var(--u)); object-fit: cover; }
 @media (prefers-reduced-motion: reduce) {
   .js [data-anim] { transition: none !important; opacity: 1 !important; clip-path: none !important; }
   .js [data-anim]:not(.final__scribble--a img) { transform: none !important; }
-  .js .box[data-anim] .box__text { transition: none !important; opacity: 1 !important; transform: none !important; }
   [data-parallax] { translate: none !important; will-change: auto; }
   .js .final__disc[data-anim] { transition: none !important; }
   *, *::before, *::after { animation: none !important; }
